@@ -26,3 +26,11 @@ Route::post('/login', 'UserController@authenticateapp');
 
 //CADASTRA USUARIO APP
 Route::post('/users_app', 'UserController@store_app');
+
+//CADASTRA CATEGORIAS ESTABELECIMENTO
+Route::get('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@index');
+Route::post('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@store');
+
+//CADASTRA ESTABELECIMENTO
+Route::get('/estabelecimento', 'EstabelecimentosController@index');
+Route::post('/estabelecimento', 'EstabelecimentosController@store');
