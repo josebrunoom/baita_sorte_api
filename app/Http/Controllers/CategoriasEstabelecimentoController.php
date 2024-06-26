@@ -77,12 +77,7 @@ class CategoriasEstabelecimentoController extends Controller
     public function update(Request $request, $id)
     {
 		try {
-			$validator = Validator::make($request->all(), CategoriasEstabelecimento::$rules_update, MazeHelper::get_mensagens_validacao());
-
-			if($validator->fails())
-			{
-				throw new MazeException($validator->errors()->first(), 400);
-			}
+			
 			
             if(!$Categoria = CategoriasEstabelecimento::find($id))
             {

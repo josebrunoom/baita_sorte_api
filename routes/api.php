@@ -27,10 +27,14 @@ Route::post('/login', 'UserController@authenticateapp');
 //CADASTRA USUARIO APP
 Route::post('/users_app', 'UserController@store_app');
 
-//CADASTRA CATEGORIAS ESTABELECIMENTO
+// CATEGORIAS ESTABELECIMENTO
 Route::get('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@index');
 Route::post('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@store');
+Route::put('/categorias_estabelecimento/{id}', 'CategoriasEstabelecimentoController@update');
+Route::delete('/categorias_estabelecimento/{id}', 'CategoriasEstabelecimentoController@delete');
 
-//CADASTRA ESTABELECIMENTO
+// ESTABELECIMENTO
 Route::get('/estabelecimento', 'EstabelecimentosController@index');
 Route::post('/estabelecimento', 'EstabelecimentosController@store');
+Route::put('/estabelecimento/{id}', 'EstabelecimentosController@update');
+Route::delete('/estabelecimento/{id}', 'EstabelecimentosController@delete');
