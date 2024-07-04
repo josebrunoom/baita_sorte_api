@@ -29,12 +29,14 @@ Route::post('/users_app', 'UserController@store_app');
 
 // CATEGORIAS ESTABELECIMENTO
 Route::get('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@index');
+Route::get('/categorias_estabelecimento/{id}', 'CategoriasEstabelecimentoController@show');
 Route::post('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@store');
 Route::put('/categorias_estabelecimento/{id}', 'CategoriasEstabelecimentoController@update');
 Route::delete('/categorias_estabelecimento/{id}', 'CategoriasEstabelecimentoController@delete');
 
 // ESTABELECIMENTO
 Route::get('/estabelecimento', 'EstabelecimentosController@index');
+Route::get('/estabelecimento/{id}', 'EstabelecimentosController@show');
 Route::post('/estabelecimento', 'EstabelecimentosController@store');
 Route::put('/estabelecimento/{id}', 'EstabelecimentosController@update');
 Route::delete('/estabelecimento/{id}', 'EstabelecimentosController@delete');
