@@ -59,12 +59,6 @@ class UserController extends Controller
     {
         try
         {   
-			$validator = Validator::make($request->all(), User::$rules_post, MazeHelper::get_mensagens_validacao());
-
-			if($validator->fails())
-			{
-				throw new MazeException($validator->errors()->first(), 400);
-			}
 
             $User = new User;
             $User->fill($request->all());
@@ -116,12 +110,7 @@ class UserController extends Controller
     {
         try
         {   
-			$validator = Validator::make($request->all(), User::$rules_post, MazeHelper::get_mensagens_validacao());
-
-			if($validator->fails())
-			{
-				throw new MazeException($validator->errors()->first(), 400);
-			}
+			
 		
             $User = new User;
             $User->fill($request->all());
@@ -160,40 +149,14 @@ class UserController extends Controller
 
     public function update(Request $request, $id)
     {
-        try { \JWTAuth::parseToken()->authenticate(); } catch (Exception $e) {};
+        //try { \JWTAuth::parseToken()->authenticate(); } catch (Exception $e) {};
 
 		try {
-
-            $user = Auth::user();
-
-            if($user->tipo != 1){
-
-                if($id != $user->id){
-                    throw new MazeException("Usuário não autorizado para este conteúdo");
-                }
-
-            }
-
-			$validator = Validator::make($request->all(), User::$rules_update, MazeHelper::get_mensagens_validacao());
-
-			if($validator->fails())
-			{
-				throw new MazeException($validator->errors()->first(), 400);
-			}
 			
             if(!$User = User::find($id))
             {
                 throw new MazeException('Usuário não encontrado.', 404);
             }
-
-            if ($foto_usuario = $request->file('foto_usuario')) {
-                $User->foto_usuario = MazeHelper::salva_arquivo_aws('usuarios', $foto_usuario, time() . '_' . $foto_usuario->getClientOriginalName());
-            } 
-
-            if ($foto_documento = $request->file('fotod_documento')) {
-                $User->foto_documento = MazeHelper::salva_arquivo_aws('usuarios', $foto_documento, time() . '_' . $foto_documento->getClientOriginalName());
-            } 
-
 
             $User->fill($request->all());
             $User->save();
