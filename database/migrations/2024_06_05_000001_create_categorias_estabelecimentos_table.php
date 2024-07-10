@@ -28,6 +28,8 @@ class CreateCategoriasEstabelecimentosTable extends Migration
             $table->string('nome', 45)->nullable()->default(null);
             $table->string('icone')->nullable()->default(null);
             $table->string('descricao')->nullable()->default(null);
+            $table->softDeletes();
+            $table->timestamps();
         });
     }
 

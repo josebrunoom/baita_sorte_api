@@ -13,7 +13,13 @@ return [
     |
     */
 
-    'name' => env('APP_NAME', 'Laravel'),
+    'name' => env('APP_NAME', 'Baita sorte'),
+
+    'AWS_ACCESS_KEY_ID' => env('AWS_ACCESS_KEY_ID', 'AKIAIXLO3DSIOOAOT6FA'),
+    'AWS_SECRET_ACCESS_KEY' => env('AWS_SECRET_ACCESS_KEY', '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'),
+    'AWS_DEFAULT_REGION' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    'AWS_BUCKET' => env('AWS_BUCKET', 'bucketbaitasorte'),
+
 
     /*
     |--------------------------------------------------------------------------

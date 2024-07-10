@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\MazeHelper;
+use Illuminate\Support\Facades\Storage;
 
 class CategoriasEstabelecimentoController extends Controller
 {
@@ -34,12 +35,12 @@ class CategoriasEstabelecimentoController extends Controller
     public function show($id)
     {
 		try {
-            if(!$marca = CategoriasEstabelecimento::find($id))
+            if(!$categoria = CategoriasEstabelecimento::find($id))
             {
                 throw new MazeException('Categoria não encontrada.', 404);
             }
 
-            return response()->json($marca, 200);
+            return response()->json($categoria, 200);
         }
         catch (MazeException $e)
         {
@@ -48,7 +49,7 @@ class CategoriasEstabelecimentoController extends Controller
         catch (Exception $e)
         {
             Log::error($e);
-            throw new MazeException('Não foi possível listar a marca', 500);
+            throw new MazeException('Não foi possível listar a categoria', 500);
         }
     }
 
@@ -59,6 +60,16 @@ class CategoriasEstabelecimentoController extends Controller
 			
             $Categoria = new CategoriasEstabelecimento;
             $Categoria->fill($request->all());
+
+            if($arquivo = $request->file('icone')) {
+                $url = 'https://s3.' . config('app.AWS_DEFAULT_REGION') . '.amazonaws.com/' . config('app.AWS_BUCKET') . '/';
+                $name = time() . '_' . $this->clean(strtolower($request['nome']))   . '.' . $arquivo->getClientOriginalExtension();
+                
+                $filePath = 'arquivos/' . $name;
+                Storage::disk('s3')->put($filePath, file_get_contents($arquivo));
+                $Categoria->icone = $url.$filePath;
+            }
+
             $Categoria->save();
 
             return response()->json($Categoria, 200);
@@ -70,7 +81,7 @@ class CategoriasEstabelecimentoController extends Controller
         catch (Exception $e)
         {
             Log::error($e);
-            throw new MazeException('Não foi possível cadastrar a marca', 500);
+            throw new MazeException('Não foi possível cadastrar a categoria', 500);
         }
     }
 
@@ -96,7 +107,7 @@ class CategoriasEstabelecimentoController extends Controller
         catch (Exception $e)
         {
             Log::error($e);
-            throw new MazeException('Não foi possível atualizar a marca', 500);
+            throw new MazeException('Não foi possível atualizar a categoria', 500);
         }
     }
 
@@ -122,5 +133,11 @@ class CategoriasEstabelecimentoController extends Controller
             Log::error($e);
             throw new MazeException('Não foi possível deletar a Categoria', 500);
         }
+    }
+
+    private function clean($string) {
+        $string = str_replace(' ', '_', $string); // Replaces all spaces with hyphens.
+     
+        return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
     }
 }

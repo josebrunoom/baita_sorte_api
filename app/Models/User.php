@@ -17,6 +17,7 @@ class User extends Authenticatable implements JWTSubject
 {
 	public $timestamps = false;
 	protected $table = 'users';
+	use SoftDeletes;
 
 	protected $casts = [
 		'birth_date' => 'datetime'

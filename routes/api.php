@@ -44,3 +44,6 @@ Route::get('/estabelecimento/{id}', 'EstabelecimentosController@show');
 Route::post('/estabelecimento', 'EstabelecimentosController@store');
 Route::put('/estabelecimento/{id}', 'EstabelecimentosController@update');
 Route::delete('/estabelecimento/{id}', 'EstabelecimentosController@delete');
+
+// DASHBOARD
+Route::get('/dashboard', 'EstabelecimentosController@dashboard');

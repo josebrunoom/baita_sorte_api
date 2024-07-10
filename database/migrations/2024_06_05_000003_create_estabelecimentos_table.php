@@ -34,6 +34,8 @@ class CreateEstabelecimentosTable extends Migration
             $table->decimal('longitude', 10, 2)->nullable()->default(null);
             $table->string('instagram')->nullable()->default(null);
             $table->string('status', 1)->nullable()->default(null);
+            $table->softDeletes();
+            $table->timestamps();
             $table->unsignedInteger('categorias_estabelecimentos_id');
 
             $table->index(["categorias_estabelecimentos_id"], 'fk_estabelecimentos_categorias_estabelecimentos_idx');
