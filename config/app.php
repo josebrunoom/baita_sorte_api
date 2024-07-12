@@ -15,7 +15,10 @@ return [
 
     'name' => env('APP_NAME', 'Baita sorte'),
 
-                
+    'AWS_ACCESS_KEY_ID' => env('AWS_ACCESS_KEY_ID', ''),
+    'AWS_SECRET_ACCESS_KEY' => env('AWS_SECRET_ACCESS_KEY', ''),
+    'AWS_DEFAULT_REGION' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+    'AWS_BUCKET' => env('AWS_BUCKET', ''),
 
 
     /*
