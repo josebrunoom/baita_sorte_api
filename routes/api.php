@@ -53,5 +53,12 @@ Route::post('/atracoes_estabelecimento', 'AtracoesEstabelecimentosController@sto
 Route::put('/atracoes_estabelecimento/{id}', 'AtracoesEstabelecimentosController@update');
 Route::delete('/atracoes_estabelecimento/{id}', 'AtracoesEstabelecimentosController@delete');
 
+// SORTEIOS
+Route::get('/sorteios', 'SorteiosController@index');
+Route::get('/sorteios/{id}', 'SorteiosController@show');
+Route::post('/sorteios', 'SorteiosController@store');
+Route::put('/sorteios/{id}', 'SorteiosController@update');
+Route::delete('/sorteios/{id}', 'SorteiosController@delete');
+
 // DASHBOARD
 Route::get('/dashboard', 'EstabelecimentosController@dashboard');
