@@ -45,5 +45,13 @@ Route::post('/estabelecimento', 'EstabelecimentosController@store');
 Route::put('/estabelecimento/{id}', 'EstabelecimentosController@update');
 Route::delete('/estabelecimento/{id}', 'EstabelecimentosController@delete');
 
+
+// ATRACOES ESTABELECIMENTO
+Route::get('/atracoes_estabelecimento', 'AtracoesEstabelecimentosController@index');
+Route::get('/atracoes_estabelecimento/{id}', 'AtracoesEstabelecimentosController@show');
+Route::post('/atracoes_estabelecimento', 'AtracoesEstabelecimentosController@store');
+Route::put('/atracoes_estabelecimento/{id}', 'AtracoesEstabelecimentosController@update');
+Route::delete('/atracoes_estabelecimento/{id}', 'AtracoesEstabelecimentosController@delete');
+
 // DASHBOARD
 Route::get('/dashboard', 'EstabelecimentosController@dashboard');
