@@ -32,6 +32,7 @@ class CreateUsersTable extends Migration
             $table->string('genero', 1)->nullable()->default(null);
             $table->dateTime('birth_date')->nullable()->default(null);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\MazeHelper;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class SorteiosController extends Controller
 {
@@ -55,6 +56,30 @@ class SorteiosController extends Controller
         }
     }
 
+    public function showApp()
+    {
+		try {
+            if(!$Sorteio = DB::table('sorteios')
+            ->whereRaw('created_at >= FROM_UNIXTIME(UNIX_TIMESTAMP(SUBDATE(NOW(),INTERVAL 1 WEEK)))')
+            ->get())
+            {
+                throw new MazeException('Sorteio não encontrado.', 404);
+            }
+
+            return response()->json($Sorteio, 200);
+        }
+        catch (MazeException $e)
+        {
+            throw $e;
+        }
+        catch (Exception $e)
+        {
+            Log::error($e);
+            throw new MazeException('Não foi possível listar o Sorteio', 500);
+        }
+    }
+
+    
     public function store(Request $request)
     {
         try

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use App\MazeHelper;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class AtracoesEstabelecimentosController extends Controller
 {
@@ -53,6 +54,30 @@ class AtracoesEstabelecimentosController extends Controller
         {
             Log::error($e);
             throw new MazeException('Não foi possível listar o AtracoesEstabelecimento', 500);
+        }
+    }
+
+    public function showApp()
+    {
+		try {
+            if(!$atracao = DB::table('atracoes_estabelecimento')
+            ->whereRaw('atracoes_estabelecimento.data_atracao >= FROM_UNIXTIME(UNIX_TIMESTAMP(SUBDATE(NOW(),INTERVAL 1 WEEK)))')
+            ->join("estabelecimentos", "estabelecimentos.id", "atracoes_estabelecimento.estabelecimentos_id")
+            ->get())
+            {
+                throw new MazeException('Sorteio não encontrado.', 404);
+            }
+
+            return response()->json($atracao, 200);
+        }
+        catch (MazeException $e)
+        {
+            throw $e;
+        }
+        catch (Exception $e)
+        {
+            Log::error($e);
+            throw new MazeException('Não foi possível listar o Sorteio', 500);
         }
     }
 
