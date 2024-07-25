@@ -42,6 +42,7 @@ class AtracoesEstabelecimento extends Model
 		'data_atracao',
 		'inicio_divulgacao',
 		'fim_divulgacao',
+		'foto',
 		'estabelecimentos_id'
 	];
 

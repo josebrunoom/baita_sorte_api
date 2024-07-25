@@ -41,8 +41,6 @@ class Estabelecimento extends Model
 	use SoftDeletes;
 
 	protected $casts = [
-		'latitude' => 'float',
-		'longitude' => 'float',
 		'categorias_estabelecimentos_id' => 'int'
 	];
 
@@ -52,8 +50,7 @@ class Estabelecimento extends Model
 		'foto',
 		'phone',
 		'endereco',
-		'latitude',
-		'longitude',
+		'mapa',
 		'instagram',
 		'status',
 		'categorias_estabelecimentos_id'

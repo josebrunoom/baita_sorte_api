@@ -42,6 +42,7 @@ class Sorteio extends Model
 		'descricao',
 		'data_inicio',
 		'data_fim',
+		'foto',
 		'status',
 		'estabelecimentos_id'
 	];
