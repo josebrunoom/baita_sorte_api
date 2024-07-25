@@ -30,6 +30,7 @@ class CreateSorteiosTable extends Migration
             $table->dateTime('data_inicio')->nullable()->default(null);
             $table->dateTime('data_fim')->nullable()->default(null);
             $table->string('status', 1)->nullable()->default(null);
+            $table->string('foto')->nullable()->default(null);
             $table->unsignedInteger('estabelecimentos_id');
 
             $table->index(["estabelecimentos_id"], 'fk_sorteios_estabelecimentos1_idx');

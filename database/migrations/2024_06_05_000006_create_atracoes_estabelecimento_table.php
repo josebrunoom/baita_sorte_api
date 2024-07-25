@@ -30,6 +30,7 @@ class CreateAtracoesEstabelecimentoTable extends Migration
             $table->dateTime('data_atracao')->nullable()->default(null);
             $table->dateTime('inicio_divulgacao')->nullable()->default(null);
             $table->dateTime('fim_divulgacao')->nullable()->default(null);
+            $table->string('foto')->nullable()->default(null);
             $table->unsignedInteger('estabelecimentos_id');
 
             $table->index(["estabelecimentos_id"], 'fk_atracoes_estabelecimento_estabelecimentos1_idx');

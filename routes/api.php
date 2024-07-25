@@ -63,5 +63,8 @@ Route::delete('/sorteios/{id}', 'SorteiosController@delete');
 //ATRACOES
 Route::get('/atracoes_app', 'AtracoesEstabelecimentosController@showApp');
 
+//SORTEIO ATIVO
+Route::get('/sorteio_ativo', 'SorteiosController@showApp');
+
 // DASHBOARD
 Route::get('/dashboard', 'EstabelecimentosController@dashboard');

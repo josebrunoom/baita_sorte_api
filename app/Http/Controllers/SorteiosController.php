@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use App\MazeHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class SorteiosController extends Controller
 {
@@ -59,9 +60,8 @@ class SorteiosController extends Controller
     public function showApp()
     {
 		try {
-            if(!$Sorteio = DB::table('sorteios')
-            ->whereRaw('created_at >= FROM_UNIXTIME(UNIX_TIMESTAMP(SUBDATE(NOW(),INTERVAL 1 WEEK)))')
-            ->get())
+            if(!$Sorteio = Sorteio::where('data_fim', ">" ,Carbon::now())
+            ->first())
             {
                 throw new MazeException('Sorteio não encontrado.', 404);
             }

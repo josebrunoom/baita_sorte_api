@@ -27,11 +27,10 @@ class CreateEstabelecimentosTable extends Migration
             $table->increments('id');
             $table->string('nome', 45)->nullable()->default(null);
             $table->string('descricao')->nullable()->default(null);
+            $table->string('mapa')->nullable()->default(null);
             $table->string('foto')->nullable()->default(null);
             $table->string('phone', 12)->nullable()->default(null);
             $table->string('endereco')->nullable()->default(null);
-            $table->decimal('latitude', 10, 2)->nullable()->default(null);
-            $table->decimal('longitude', 10, 2)->nullable()->default(null);
             $table->string('instagram')->nullable()->default(null);
             $table->string('status', 1)->nullable()->default(null);
             $table->softDeletes();
