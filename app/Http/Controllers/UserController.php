@@ -11,6 +11,7 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
+use \stdClass;
 
 class UserController extends Controller
 {
@@ -302,10 +303,11 @@ class UserController extends Controller
             Log::error($e);
             throw new MazeException('Erro ao criar token!', 500);
         }
+        $retorno = new stdClass;
+        $retorno->user = Auth::user();
+        $retorno->token = $token;
 
-        $user = Auth::user();
-
-        return response()->json($user);
+        return response()->json($retorno);
         
     }
 

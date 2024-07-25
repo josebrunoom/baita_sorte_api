@@ -64,7 +64,7 @@ class AtracoesEstabelecimentosController extends Controller
             ->whereRaw('atracoes_estabelecimento.data_atracao >= FROM_UNIXTIME(UNIX_TIMESTAMP(SUBDATE(NOW(),INTERVAL 1 WEEK)))')
             ->join("estabelecimentos", "estabelecimentos.id", "atracoes_estabelecimento.estabelecimentos_id")
             ->select("atracoes_estabelecimento.*","estabelecimentos.nome as nome_estabelecimento",
-             "estabelecimentos.foto as foto_estabelecimento")
+             "estabelecimentos.foto as foto_estabelecimento", "estabelecimentos.mapa")
             ->get())
             {
                 throw new MazeException('Sorteio não encontrado.', 404);

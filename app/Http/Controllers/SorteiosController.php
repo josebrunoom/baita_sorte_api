@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Sorteio;
 use App\Models\User;
+use App\Models\UsersSorteio;
+use \stdClass;
 use Illuminate\Http\Request;
 use App\Exceptions\MazeException;
 use Exception;
@@ -13,6 +15,8 @@ use App\MazeHelper;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Crypt;
 
 class SorteiosController extends Controller
 {
@@ -60,13 +64,25 @@ class SorteiosController extends Controller
     public function showApp()
     {
 		try {
-            if(!$Sorteio = Sorteio::where('data_fim', ">" ,Carbon::now())
+
+            $user = JWTAuth::user();
+    
+            if(!$Sorteio = Sorteio::where('sorteios.data_fim', ">" ,Carbon::now())
+            ->join("estabelecimentos", "estabelecimentos.id", "sorteios.estabelecimentos_id")
+            ->select("sorteios.*","estabelecimentos.nome as nome_estabelecimento")
             ->first())
             {
                 throw new MazeException('Sorteio não encontrado.', 404);
             }
 
-            return response()->json($Sorteio, 200);
+            $participa_sorteio = UsersSorteio::where("users_id",$user->id)
+            ->where("sorteios_id", $Sorteio->id)->first();
+
+            $dados = new stdClass;
+            $dados->sorteio = $Sorteio;
+            $dados->participa = $participa_sorteio;
+
+            return response()->json($dados, 200);
         }
         catch (MazeException $e)
         {
