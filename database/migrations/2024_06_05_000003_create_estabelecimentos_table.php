@@ -27,7 +27,7 @@ class CreateEstabelecimentosTable extends Migration
             $table->increments('id');
             $table->string('nome', 45)->nullable()->default(null);
             $table->string('descricao')->nullable()->default(null);
-            $table->string('mapa')->nullable()->default(null);
+            $table->text('mapa')->nullable()->default(null);
             $table->string('foto')->nullable()->default(null);
             $table->string('phone', 12)->nullable()->default(null);
             $table->string('endereco')->nullable()->default(null);
