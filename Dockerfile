@@ -1,7 +1,8 @@
 # Use a imagem oficial do PHP
 FROM php:7.0
 
-RUN apt-get update && apt-get install -y apache2
+RUN apt-get update -qq && \
+    apt-get install -y --no-install-recommends -qq apache2
 
 # 2. apache configs + document root
 RUN echo "ServerName laravel-app.local" >> /etc/apache2/apache2.conf
