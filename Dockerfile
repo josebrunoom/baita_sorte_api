@@ -35,10 +35,6 @@ RUN apt-get install -y \
     g++ \
     wget
 
-RUN apt-get install -y \
-    libaio1 \
-    libaio-dev
-
 RUN docker-php-ext-install pdo pdo_mysql zip gd
 
 # Configure a diretiva de data.timezone no php.ini
@@ -52,25 +48,6 @@ COPY . .
 
 # Instala o Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install oracle instantclient and php extensions
-RUN mkdir /opt/oracle
-ADD infra/docker/oracle /opt/oracle
-
-# Install oracle instantclient
-RUN cd /opt/oracle && \
-    wget https://conecta-santa-sdk.s3.amazonaws.com/instantclient-basic-linuxx64.zip
-
-RUN  unzip /opt/oracle/instantclient-sdk-linuxx64.zip -d /opt/oracle \
-    &&  unzip /opt/oracle/instantclient-basic-linuxx64.zip -d /opt/oracle \
-    &&  rm -rf /opt/oracle/*.zip
-
-ENV LD_LIBRARY_PATH /opt/oracle/instantclient_23_4:${LD_LIBRARY_PATH}
-
-# Install oracle php extensions
-RUN echo 'instantclient,/opt/oracle/instantclient_23_4' | pecl install oci8-3.3.0 && docker-php-ext-enable oci8 && \
-        docker-php-ext-configure pdo_oci --with-pdo-oci=instantclient,/opt/oracle/instantclient_23_4,23.4 \
-        && docker-php-ext-install pdo_oci
 
 # Instale as dependências usando o Composer
 RUN composer install
