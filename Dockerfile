@@ -1,5 +1,5 @@
 # Use a imagem oficial do PHP
-FROM php:8.2-apache
+FROM php:7.0.-apache
 
 # 2. apache configs + document root
 RUN echo "ServerName laravel-app.local" >> /etc/apache2/apache2.conf
