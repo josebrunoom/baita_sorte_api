@@ -15,7 +15,7 @@ RUN a2enmod rewrite headers
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 # Atualize os pacotes e instale as extensões necessárias do PHP
-RUN apt-get install --fix-missing
+RUN apt-get update --fix-missing
 
 # 1. development packages
 RUN apt-get install -y \
