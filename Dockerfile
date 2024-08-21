@@ -23,7 +23,7 @@ RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 RUN apt-get clean
 # Atualize os pacotes e instale as extensões necessárias do PHP
-RUN apt-get update --fix-missing
+RUN apt-get update
 
 # 1. development packages
 RUN apt-get install -y \
