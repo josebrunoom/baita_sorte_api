@@ -1,12 +1,5 @@
-
 # Use a imagem base do PHP com Apache
 FROM php:7.0-apache
-
-# Atualize e instale pacotes adicionais se necessário
-RUN apt-get update && apt-get install -y \
-    vim \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
 
 # Adicione a configuração ServerName
 RUN echo "ServerName laravel-app.local" >> /etc/apache2/apache2.conf
@@ -20,10 +13,6 @@ RUN a2enmod rewrite headers
 
 # 4. start with base php config, then add extensions
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
-
-RUN apt-get clean
-# Atualize os pacotes e instale as extensões necessárias do PHP
-RUN apt-get update
 
 # 1. development packages
 RUN apt-get install -y \
