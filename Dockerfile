@@ -1,5 +1,14 @@
 # Use a imagem oficial do PHP
-FROM php:7.0-apache
+FROM ubuntu:22.04
+
+# Atualize a lista de pacotes e instale pacotes necessários
+RUN apt-get update && apt-get install -y \
+    curl \
+    gnupg \
+    lsb-release \
+    # outros pacotes necessários
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # 2. apache configs + document root
 RUN echo "ServerName laravel-app.local" >> /etc/apache2/apache2.conf
