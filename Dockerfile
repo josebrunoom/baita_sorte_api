@@ -14,6 +14,7 @@ RUN a2enmod rewrite headers
 # 4. start with base php config, then add extensions
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
+RUN apt-get clean
 # Atualize os pacotes e instale as extensões necessárias do PHP
 RUN apt-get update --fix-missing
 
