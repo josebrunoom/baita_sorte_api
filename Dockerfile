@@ -1,5 +1,11 @@
 # Use a imagem base do PHP com Apache
-FROM php:7.0-apache
+FROM php:7.4-apache
+
+# Atualize e instale pacotes adicionais se necessário
+RUN apt-get update && apt-get install -y \
+    vim \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 # Adicione a configuração ServerName
 RUN echo "ServerName laravel-app.local" >> /etc/apache2/apache2.conf
