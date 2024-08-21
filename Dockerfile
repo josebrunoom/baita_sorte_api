@@ -21,7 +21,7 @@ RUN a2enmod rewrite headers
 RUN mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini"
 
 # 1. development packages
-RUN apt-get install -y \
+RUN apt-get update && apt-get install -y \
     git \
     zip \
     curl \
@@ -36,7 +36,9 @@ RUN apt-get install -y \
     libreadline-dev \
     libfreetype6-dev \
     g++ \
-    wget
+    wget \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN docker-php-ext-install pdo pdo_mysql zip gd
 
