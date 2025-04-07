@@ -3,7 +3,7 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Throwable;
+use Exception;
 
 class Handler extends ExceptionHandler
 {
@@ -34,7 +34,7 @@ class Handler extends ExceptionHandler
      *
      * @throws \Exception
      */
-    public function report(Throwable $exception)
+    public function report(Exception $exception)
     {
         parent::report($exception);
     }
@@ -48,18 +48,8 @@ class Handler extends ExceptionHandler
      *
      * @throws \Throwable
      */
-    public function render($request, Throwable $exception)
+    public function render($request, Exception $exception)
     {
-        if($exception instanceof MazeException)
-        {
-            return response()->json(
-                [
-                    'message' => $exception->getMessage(),
-                    'data' => date('Y-m-d H:i:s', now()->timestamp),    // imprime a data para encontrar no log
-                ],
-                $exception->getCode() == 0 ? 500 : $exception->getCode()
-            );
-        }
         return parent::render($request, $exception);
     }
 }
