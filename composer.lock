@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ca346bb9b209ce19ebf76f5937f12100",
+    "content-hash": "f27515f5f73a9516763570fea7bda046",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -6906,16 +6906,16 @@
         },
         {
             "name": "reliese/laravel",
-            "version": "v1.3.2",
+            "version": "v0.0.14",
             "source": {
                 "type": "git",
                 "url": "https://github.com/reliese/laravel.git",
-                "reference": "c286d2815987fa627a26cce3d2f1f04dd031c626"
+                "reference": "490d503836ca5e375c8d886cc2511c3b1ac43f71"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/reliese/laravel/zipball/c286d2815987fa627a26cce3d2f1f04dd031c626",
-                "reference": "c286d2815987fa627a26cce3d2f1f04dd031c626",
+                "url": "https://api.github.com/repos/reliese/laravel/zipball/490d503836ca5e375c8d886cc2511c3b1ac43f71",
+                "reference": "490d503836ca5e375c8d886cc2511c3b1ac43f71",
                 "shasum": ""
             },
             "require": {
@@ -6925,12 +6925,12 @@
                 "illuminate/database": ">=5.1",
                 "illuminate/filesystem": ">=5.1",
                 "illuminate/support": ">=5.1",
-                "php": "^7.3|^8.0"
+                "php": ">=5.6.4"
             },
             "require-dev": {
                 "fzaninotto/faker": "~1.4",
-                "mockery/mockery": ">=1.4",
-                "phpunit/phpunit": "^9"
+                "mockery/mockery": "0.9.*",
+                "phpunit/phpunit": "~5.0"
             },
             "type": "library",
             "extra": {
@@ -6965,7 +6965,7 @@
                 "issues": "https://github.com/reliese/laravel/issues",
                 "source": "https://github.com/reliese/laravel"
             },
-            "time": "2024-06-06T14:27:32+00:00"
+            "time": "2019-12-26T23:35:33+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",
@@ -7747,7 +7747,7 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
