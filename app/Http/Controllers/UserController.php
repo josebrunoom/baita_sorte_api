@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use \stdClass;
+use Illuminate\Support\Facades\Log;
 
 class UserController extends Controller
 {
