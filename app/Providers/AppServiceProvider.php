@@ -24,5 +24,6 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         //
+        putenv('AWS_SUPPRESS_PHP_DEPRECATION_WARNING=true');
     }
 }
