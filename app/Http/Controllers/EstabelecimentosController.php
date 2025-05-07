@@ -125,6 +125,7 @@ class EstabelecimentosController extends Controller
 
             $Estabelecimento->fill($request->all());
 
+            
             if ($imagem = $request->file('foto')) {
                 $url = 'https://s3.' . config('app.AWS_DEFAULT_REGION') . '.amazonaws.com/' . config('app.AWS_BUCKET') . '/';
                 $name = time() . '_' . $this->clean(strtolower($request['nome']))   . '.' . $imagem->getClientOriginalExtension();
