@@ -61,9 +61,15 @@ class UserController extends Controller
     {
         try
         {   
-
             $User = new User;
-            $User->fill($request->all());
+            $data = $request->all();
+            
+            // Formata a data se existir
+            if (isset($data['birth_date'])) {
+                $data['birth_date'] = Carbon::parse($data['birth_date'])->format('Y-m-d H:i:s');
+            }
+            
+            $User->fill($data);
             $User->save();
 
             //Mail::send(new EnviarCadastro($retorno));
@@ -160,7 +166,14 @@ class UserController extends Controller
                 throw new MazeException('Usuário não encontrado.', 404);
             }
 
-            $User->fill($request->all());
+            $data = $request->all();
+            
+            // Formata a data se existir
+            if (isset($data['birth_date'])) {
+                $data['birth_date'] = Carbon::parse($data['birth_date'])->format('Y-m-d H:i:s');
+            }
+
+            $User->fill($data);
             $User->save();
 
             return response()->json($User, 200);
