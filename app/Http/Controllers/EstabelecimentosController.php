@@ -124,6 +124,19 @@ class EstabelecimentosController extends Controller
             }
 
             $Estabelecimento->fill($request->all());
+
+            if ($imagem = $request->file('foto')) {
+                $url = 'https://s3.' . config('app.AWS_DEFAULT_REGION') . '.amazonaws.com/' . config('app.AWS_BUCKET') . '/';
+                $name = time() . '_' . $this->clean(strtolower($Estabelecimento->nome));
+                $filePath = 'arquivos/' . $name;
+
+                $path_delete = str_replace($url,'',$Estabelecimento->foto);
+                $a = Storage::disk('s3')->delete($path_delete);
+
+                Storage::disk('s3')->put($filePath, file_get_contents($imagem));
+                $Estabelecimento->foto = $url . $filePath;
+            }
+
             $Estabelecimento->save();
 
             return response()->json($Estabelecimento, 200);
