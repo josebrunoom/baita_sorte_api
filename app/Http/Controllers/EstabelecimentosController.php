@@ -127,10 +127,10 @@ class EstabelecimentosController extends Controller
 
             if ($imagem = $request->file('foto')) {
                 $url = 'https://s3.' . config('app.AWS_DEFAULT_REGION') . '.amazonaws.com/' . config('app.AWS_BUCKET') . '/';
-                $name = time() . '_' . $this->clean(strtolower($request['nome']))   . '.' . $arquivo->getClientOriginalExtension();
+                $name = time() . '_' . $this->clean(strtolower($request['nome']))   . '.' . $imagem->getClientOriginalExtension();
                 
                 $filePath = 'arquivos/' . $name;
-                Storage::disk('s3')->put($filePath, file_get_contents($arquivo));
+                Storage::disk('s3')->put($filePath, file_get_contents($imagem));
                 $Estabelecimento->foto = $url.$filePath;
             }
 
