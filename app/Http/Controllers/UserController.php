@@ -102,7 +102,26 @@ class UserController extends Controller
             $user->fill($data);
             $user->save();
 
-            return response()->json($user, 201);
+            $credentials = $request->only('login', 'password');
+       
+            try 
+            {
+                if (! $token = JWTAuth::attempt($credentials))
+                {
+                    throw new MazeException('Credenciais incorretas!', 400);
+                }
+            } 
+            catch (JWTException $e) 
+            {
+                Log::error($e);
+                throw new MazeException('Erro ao criar token!', 500);
+            }
+
+            $retorno = new stdClass;
+            $retorno->user = Auth::user();
+            $retorno->token = $token;
+
+            return response()->json($retorno, 201);
         }
         catch(JWTException $e)
         {
