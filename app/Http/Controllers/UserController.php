@@ -92,9 +92,15 @@ class UserController extends Controller
         try
         {   
             $user = new User;
-            $user->fill($request->all());
+            $data = $request->all();
+            
+            // Formata a data se existir
+            if (isset($data['birth_date'])) {
+                $data['birth_date'] = Carbon::parse($data['birth_date'])->format('Y-m-d H:i:s');
+            }
+            
+            $user->fill($data);
             $user->save();
-
 
             return response()->json($user, 201);
         }
