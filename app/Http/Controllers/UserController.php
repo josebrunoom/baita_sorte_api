@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
-
+use App\Models\Aparelho;
 use Illuminate\Http\Request;
 use App\Exceptions\MazeException;
-use App\MazeHelper;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Exception;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use \stdClass;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
+use App\MazeHelper;
 
 class UserController extends Controller
 {
@@ -136,6 +138,37 @@ class UserController extends Controller
         {
             Log::error($e);
             throw new MazeException('Não foi possível cadastrar o Usuario', 500);
+        }
+    }
+
+    public function aparelhoUser(Request $request)
+    {
+        try {\JWTAuth::parseToken()->authenticate();} catch (Exception $e) {};
+
+        try {
+            $user = Auth::user();
+
+            $aparelho = Aparelho::firstOrCreate([
+                'users_id' => $user->id,
+                'identificador' => $request->input('identificador'),
+                'tipo' => $request->input('tipo'),
+            ]);
+            
+            $response = array();
+            $response['user'] = $user;
+            $response['aparelho'] = $aparelho;
+
+            return response()->json([
+                'data' => $response,
+            ], 200);
+        } catch (JWTException $e) {
+            $message = [
+                'exception' => $e->getMessage(),
+                'title' => 'Erro interno de servidor',
+                'message' => 'Não foi possível realizar o login devido a um erro interno',
+            ];
+
+            return response()->json($message, 500);
         }
     }
 

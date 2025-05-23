@@ -37,6 +37,8 @@ Route::post('/users_sorteio', 'UsersSorteioController@store');
 //USERS DEVICE APP
 Route::post('/users_device', 'UsersDeviceController@store');
 
+Route::post('aparelho_user'                         ,       'UserController@aparelhoUser'); 
+
 
 
 // CATEGORIAS ESTABELECIMENTO
