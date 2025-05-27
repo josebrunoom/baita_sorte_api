@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Kreait\Firebase\Messaging\CloudMessage;
+use Kreait\Firebase\Messaging\CloudMessagingService;
+use Kreait\Firebase\Messaging\Notification;
+use Kreait\Firebase\Messaging\CloudMessageFactory;
 use App\Models\Aparelho;
 use Illuminate\Http\Request;
 use App\Exceptions\MazeException;
@@ -170,6 +174,110 @@ class UserController extends Controller
 
             return response()->json($message, 500);
         }
+    }
+
+    public function envia_notificacao(Request $request) {
+		try {
+			
+            $usuarios = $request->all();
+            
+            $qtd = (count($usuarios['usuario']));
+            
+            for ($i=0; $i<$qtd;$i++) {
+
+				//($usuarios['usuario'][$i]);
+
+				$user = User::where('id', $usuarios['usuario'][$i])->first();
+
+				$estabelecimentoParam['nome'] = 'nome';
+				$estabelecimentoParam['id'] = 1;
+				$estabelecimentoParam['foto'] = 'foto';
+				$estabelecimentoParam['registros_necessarios'] = 6;
+				$estabelecimentoParam['qtd_cupons'] = "10";
+
+				if(isset($user->aparelhos)){
+
+					$aparelhos = $user->aparelhos->pluck('identificador')->toArray();
+					if(count($user->aparelhos->pluck('identificador')) > 0 ){
+
+						$this->enviar_notificacao($usuarios['titulo'],$usuarios['mensagem'], $aparelhos);
+
+					}
+				}
+            }
+			
+			return response()->json([
+				'data'=> true
+			],200);
+		} catch (Exception $e) {
+			\DB::rollBack();
+            \Log::info(get_class($e).' | '.$e->getMessage());
+            return response()->json([
+                'title'=>'Erro desconhecido',
+                'message'=>'Erro ao enviar notificações.',
+                'exception'=>$e->getMessage()
+            ],500);
+        }
+    }
+
+    public function enviar_notificacao($titulo, $mensagem, $tokens){
+        $notification = Notification::fromArray([
+            'title' => $titulo,
+            'body' => $mensagem
+        ]);
+
+        $message = CloudMessage::withTarget('token', $tokens)
+            ->withNotification($notification)
+            ->withTtl(60 * 20)
+            ->withData([
+                'sound' => 'default',
+                'icon' => 'www/img/icones/android-icon-48x48.png'
+            ]);
+
+        $messaging = app(CloudMessagingService::class);
+        $response = $messaging->send($message);
+
+        return $response;
+
+        $dataBuilder = new PayloadDataBuilder();
+        $dataBuilder->addData([
+            // 'title' => "titulo teste",
+            'vibrate' => 1,
+            'pagina'=>"pagina teste",
+            'codParams'=>"params teste"
+        ]);
+
+        $option = $optionBuilder->build();
+        $notification = $notificationBuilder->build();
+        $data = $dataBuilder->build();
+
+        
+
+        // You must change it to get your tokens
+        $tokens = $tokens;
+
+        $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
+        
+        $downstreamResponse->numberSuccess();
+        $downstreamResponse->numberFailure();
+        $downstreamResponse->numberModification();
+
+        //return Array - you must remove all this tokens in your database
+        $tokensToDelete = $downstreamResponse->tokensToDelete();
+        \App\Aparelho::whereIn('identificador',$tokensToDelete)->delete();    
+
+        //return Array (key : oldToken, value : new token - you must change the token in your database )
+        $tokensToUpdate = $downstreamResponse->tokensToModify();
+        foreach ($tokensToUpdate as $old=>$new) {
+            \App\Aparelho::where('identificador',$old)->update(['identificador'=>$new]);
+        }
+
+        //return Array - you should try to resend the message to the tokens in the array
+        $downstreamResponse->tokensToRetry();
+
+        // return Array (key:token, value:errror) - in production you should remove from your database the tokens present in this array
+        $downstreamResponse->tokensWithError();
+
     }
 
     public function store_com_foto(Request $request)
