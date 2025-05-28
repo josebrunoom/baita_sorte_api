@@ -266,18 +266,18 @@ class UserController extends Controller
             Log::info('Conteúdo do iframe: ' . $estabelecimento->mapa);
 
             // Extrair latitude e longitude do parâmetro pb do iframe do Google Maps
-            preg_match('/pb=!1m18!1m12!1m3!1d(.*?)!2d(.*?)!3d(.*?)!/', $estabelecimento->mapa, $matches);
+            preg_match('/pb=!1m17!1m12!1m3!1d(.*?)!2d(.*?)!3d(.*?)!/', $estabelecimento->mapa, $matches);
             
             Log::info('Matches encontrados: ' . print_r($matches, true));
             
             if (empty($matches[2]) || empty($matches[3])) {
                 // Tentar extrair usando uma expressão regular mais simples
-                preg_match('/!2d(.*?)!3d(.*?)!/', $estabelecimento->iframe_mapa, $matches2);
+                preg_match('/!2d(.*?)!3d(.*?)!/', $estabelecimento->mapa, $matches2);
                 
                 Log::info('Tentando extrair com regex alternativa: ' . print_r($matches2, true));
                 
                 if (empty($matches2[1]) || empty($matches2[2])) {
-                    return response()->json(['error' => 'Localização do estabelecimento não encontrada no iframe', 'iframe_content' => $estabelecimento->iframe_mapa], 400);
+                    return response()->json(['error' => 'Localização do estabelecimento não encontrada no iframe', 'iframe_content' => $estabelecimento->mapa], 400);
                 }
                 
                 $estabelecimentoLat = floatval($matches2[2]);
@@ -297,7 +297,7 @@ class UserController extends Controller
                 $estabelecimentoLon
             );
 
-            $dentroDoRaio = $distancia <= 100;
+            $dentroDoRaio = $distancia <= 300;
 
             if($dentroDoRaio){
                 return response()->json([
@@ -307,7 +307,7 @@ class UserController extends Controller
                 ]);
             }
 
-            return response()->json(['error' => 'Fora do raio'], 400);
+            return response()->json(['error' => 'Fora do raio', 'distancia' => $distancia], 400);
 
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
