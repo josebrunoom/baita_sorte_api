@@ -61,6 +61,10 @@ class User extends Authenticatable implements JWTSubject
 		return $this->hasMany(VisualizacoesEstabelecimento::class, 'users_id');
 	}
 
+	public function aparelhos() {
+        return $this->hasMany(Aparelho::class,'users_id');
+    }
+
 	public function getJWTIdentifier()
     {
         return $this->getKey();

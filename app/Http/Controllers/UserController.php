@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Kreait\Firebase\Messaging\CloudMessage;
-use Kreait\Firebase\Messaging\CloudMessagingService;
-use Kreait\Firebase\Messaging\Notification;
-use Kreait\Firebase\Messaging\CloudMessageFactory;
+use Kreait\Firebase\Messaging;
 use App\Models\Aparelho;
 use Illuminate\Http\Request;
+use Kreait\Firebase\Factory;
+use Kreait\Firebase\Messaging\Notification as FirebaseNotification;
+use Illuminate\Support\Facades\Validator;
+use App\Models\Estabelecimento;
 use App\Exceptions\MazeException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -185,29 +187,23 @@ class UserController extends Controller
             
             for ($i=0; $i<$qtd;$i++) {
 
-				//($usuarios['usuario'][$i]);
-
 				$user = User::where('id', $usuarios['usuario'][$i])->first();
-
-				$estabelecimentoParam['nome'] = 'nome';
-				$estabelecimentoParam['id'] = 1;
-				$estabelecimentoParam['foto'] = 'foto';
-				$estabelecimentoParam['registros_necessarios'] = 6;
-				$estabelecimentoParam['qtd_cupons'] = "10";
 
 				if(isset($user->aparelhos)){
 
 					$aparelhos = $user->aparelhos->pluck('identificador')->toArray();
-					if(count($user->aparelhos->pluck('identificador')) > 0 ){
-
-						$this->enviar_notificacao($usuarios['titulo'],$usuarios['mensagem'], $aparelhos);
-
+					if(count($aparelhos) > 0 ){
+						foreach ($aparelhos as $aparelho) {
+							Log::info('Enviando notificação para token: ' . $aparelho);
+							$retorno = $this->enviar_notificacao($usuarios['titulo'],$usuarios['mensagem'], [$aparelho]);
+							Log::info('Resposta da notificação: ' . json_encode($retorno));
+						}
 					}
 				}
-            }
+			}
 			
 			return response()->json([
-				'data'=> true
+				'data'=> $retorno
 			],200);
 		} catch (Exception $e) {
 			\DB::rollBack();
@@ -220,24 +216,147 @@ class UserController extends Controller
         }
     }
 
-    public function enviar_notificacao($titulo, $mensagem, $tokens){
-        $notification = Notification::fromArray([
-            'title' => $titulo,
-            'body' => $mensagem
-        ]);
+    /**
+     * Calcula a distância em metros entre dois pontos usando latitude e longitude
+     * @param float $lat1 Latitude do ponto 1
+     * @param float $lon1 Longitude do ponto 1
+     * @param float $lat2 Latitude do ponto 2
+     * @param float $lon2 Longitude do ponto 2
+     * @return float Distância em metros
+     */
+    private function calcularDistancia($lat1, $lon1, $lat2, $lon2) {
+        $earthRadius = 6371000; // Raio da Terra em metros
+        
+        $dLat = deg2rad($lat2 - $lat1);
+        $dLon = deg2rad($lon2 - $lon1);
+        
+        $a = sin($dLat/2) * sin($dLat/2) +
+             cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * 
+             sin($dLon/2) * sin($dLon/2);
+        
+        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
+        
+        return $earthRadius * $c;
+    }
 
-        $message = CloudMessage::withTarget('token', $tokens)
-            ->withNotification($notification)
-            ->withTtl(60 * 20)
-            ->withData([
-                'sound' => 'default',
-                'icon' => 'www/img/icones/android-icon-48x48.png'
+    /**
+     * Calcula a distância entre o usuário e um estabelecimento
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function calcularDistanciaEstabelecimento(Request $request) {
+        try {
+            $validator = Validator::make($request->all(), [
+                'latitude' => 'required|numeric',
+                'longitude' => 'required|numeric',
+                'estabelecimentos_id' => 'required|integer|exists:estabelecimentos,id'
             ]);
 
-        $messaging = app(CloudMessagingService::class);
-        $response = $messaging->send($message);
+            if ($validator->fails()) {
+                return response()->json(['error' => $validator->errors()], 400);
+            }
 
-        return $response;
+            $estabelecimento = Estabelecimento::find($request->estabelecimentos_id);
+            
+            if (!$estabelecimento) {
+                return response()->json(['error' => 'Estabelecimento não encontrado'], 404);
+            }
+
+            // Adicionar log do conteúdo completo do iframe
+            Log::info('Conteúdo do iframe: ' . $estabelecimento->mapa);
+
+            // Extrair latitude e longitude do parâmetro pb do iframe do Google Maps
+            preg_match('/pb=!1m18!1m12!1m3!1d(.*?)!2d(.*?)!3d(.*?)!/', $estabelecimento->mapa, $matches);
+            
+            Log::info('Matches encontrados: ' . print_r($matches, true));
+            
+            if (empty($matches[2]) || empty($matches[3])) {
+                // Tentar extrair usando uma expressão regular mais simples
+                preg_match('/!2d(.*?)!3d(.*?)!/', $estabelecimento->iframe_mapa, $matches2);
+                
+                Log::info('Tentando extrair com regex alternativa: ' . print_r($matches2, true));
+                
+                if (empty($matches2[1]) || empty($matches2[2])) {
+                    return response()->json(['error' => 'Localização do estabelecimento não encontrada no iframe', 'iframe_content' => $estabelecimento->iframe_mapa], 400);
+                }
+                
+                $estabelecimentoLat = floatval($matches2[2]);
+                $estabelecimentoLon = floatval($matches2[1]);
+            } else {
+                $estabelecimentoLat = floatval($matches[3]);
+                $estabelecimentoLon = floatval($matches[2]);
+            }
+
+            // Adicionar log para debug
+            Log::info('Coordenadas do estabelecimento: Lat=' . $estabelecimentoLat . ' Lon=' . $estabelecimentoLon);
+
+            $distancia = $this->calcularDistancia(
+                $request->latitude,
+                $request->longitude,
+                $estabelecimentoLat,
+                $estabelecimentoLon
+            );
+
+            $dentroDoRaio = $distancia <= 100;
+
+            if($dentroDoRaio){
+                return response()->json([
+                    'dentro_do_raio' => $dentroDoRaio,
+                    'distancia' => $distancia,
+                    'unidade' => 'metros',
+                ]);
+            }
+
+            return response()->json(['error' => 'Fora do raio'], 400);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function enviar_notificacao($titulo, $mensagem, $tokens){
+        try {
+
+            // Configurar o Firebase diretamente
+            $factory = (new \Kreait\Firebase\Factory())
+                ->withServiceAccount(base_path('firebase.json'))
+                ->withProjectId('baitasorte');
+
+            $messaging = $factory->createMessaging();
+
+            $notification = FirebaseNotification::fromArray([
+                'title' => $titulo,
+                'body' => $mensagem
+            ]);
+
+            // If tokens is a single string, convert it to array
+            if (!is_array($tokens)) {
+                $tokens = [$tokens];
+            }
+
+            // Send message to each token
+            $responses = [];
+            foreach ($tokens as $token) {
+                
+                try {
+                    $message = CloudMessage::withTarget('token', $token)
+                        ->withNotification($notification)
+                        ->withData([
+                            'sound' => 'default',
+                            'icon' => 'www/img/icones/android-icon-48x48.png'
+                        ]);
+
+                    $response = $messaging->send($message);
+                    $responses[] = $response;
+                } catch (\Exception $e) {
+                    throw $e;
+                }
+            }
+
+            return $responses;
+        } catch (\Exception $e) {
+            throw $e;
+        }
 
         $dataBuilder = new PayloadDataBuilder();
         $dataBuilder->addData([
@@ -254,29 +373,29 @@ class UserController extends Controller
         
 
         // You must change it to get your tokens
-        $tokens = $tokens;
+        // $tokens = $tokens;
 
-        $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
+        // $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
         
-        $downstreamResponse->numberSuccess();
-        $downstreamResponse->numberFailure();
-        $downstreamResponse->numberModification();
+        // $downstreamResponse->numberSuccess();
+        // $downstreamResponse->numberFailure();
+        // $downstreamResponse->numberModification();
 
-        //return Array - you must remove all this tokens in your database
-        $tokensToDelete = $downstreamResponse->tokensToDelete();
-        \App\Aparelho::whereIn('identificador',$tokensToDelete)->delete();    
+        // //return Array - you must remove all this tokens in your database
+        // $tokensToDelete = $downstreamResponse->tokensToDelete();
+        // \App\Aparelho::whereIn('identificador',$tokensToDelete)->delete();    
 
-        //return Array (key : oldToken, value : new token - you must change the token in your database )
-        $tokensToUpdate = $downstreamResponse->tokensToModify();
-        foreach ($tokensToUpdate as $old=>$new) {
-            \App\Aparelho::where('identificador',$old)->update(['identificador'=>$new]);
-        }
+        // //return Array (key : oldToken, value : new token - you must change the token in your database )
+        // $tokensToUpdate = $downstreamResponse->tokensToModify();
+        // foreach ($tokensToUpdate as $old=>$new) {
+        //     \App\Aparelho::where('identificador',$old)->update(['identificador'=>$new]);
+        // }
 
-        //return Array - you should try to resend the message to the tokens in the array
-        $downstreamResponse->tokensToRetry();
+        // //return Array - you should try to resend the message to the tokens in the array
+        // $downstreamResponse->tokensToRetry();
 
-        // return Array (key:token, value:errror) - in production you should remove from your database the tokens present in this array
-        $downstreamResponse->tokensWithError();
+        // // return Array (key:token, value:errror) - in production you should remove from your database the tokens present in this array
+        // $downstreamResponse->tokensWithError();
 
     }
 

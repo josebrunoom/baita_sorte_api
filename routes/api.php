@@ -40,6 +40,7 @@ Route::post('/users_device', 'UsersDeviceController@store');
 Route::post('aparelho_user'                         ,       'UserController@aparelhoUser'); 
 
 Route::post('envia_notificacao'               ,       'UserController@envia_notificacao');
+Route::post('checkin_estabelecimento', 'UserController@calcularDistanciaEstabelecimento');
 
 // CATEGORIAS ESTABELECIMENTO
 Route::get('/categorias_estabelecimento', 'CategoriasEstabelecimentoController@index');

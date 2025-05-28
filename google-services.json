@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "628332577668",
+    "project_id": "baitasorte",
+    "storage_bucket": "baitasorte.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:628332577668:android:d278ffc70a5c144a3393d1",
+        "android_client_info": {
+          "package_name": "com.mazeapps.baitasorte"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "628332577668-d8skedrj5mvpggmue5tc8o71gv03voov.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.mazeapps.baitasorte",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "628332577668-18u93tokp21m2t03jj4bt42qpk7ftsef.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC7p4B24-LyeVLU-W53ieVvq9oY8Jir-6Q"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "628332577668-18u93tokp21m2t03jj4bt42qpk7ftsef.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
