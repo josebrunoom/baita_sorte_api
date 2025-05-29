@@ -184,6 +184,8 @@ class UserController extends Controller
             $usuarios = $request->all();
             
             $qtd = (count($usuarios['usuario']));
+
+            $retorno = [];
             
             for ($i=0; $i<$qtd;$i++) {
 
@@ -213,6 +215,65 @@ class UserController extends Controller
                 'message'=>'Erro ao enviar notificações.',
                 'exception'=>$e->getMessage()
             ],500);
+        }
+    }
+
+    public function enviar_notificacao($titulo, $mensagem, $tokens)
+    {
+        try {
+            // Configurar o Firebase diretamente
+            $factory = (new \Kreait\Firebase\Factory())
+                ->withServiceAccount(base_path('firebase.json'))
+                ->withProjectId('baitasorte');
+
+            $messaging = $factory->createMessaging();
+
+            $notification = FirebaseNotification::fromArray([
+                'title' => $titulo,
+                'body' => $mensagem
+            ]);
+
+            // If tokens is a single string, convert it to array
+            if (!is_array($tokens)) {
+                $tokens = [$tokens];
+            }
+
+            // Track invalid tokens for cleanup
+            $invalidTokens = [];
+
+            // Send message to each token
+            $responses = [];
+            foreach ($tokens as $token) {
+                try {
+                    $message = CloudMessage::withTarget('token', $token)
+                        ->withNotification($notification)
+                        ->withData([
+                            'sound' => 'default',
+                            'icon' => 'www/img/icones/android-icon-48x48.png'
+                        ]);
+
+                    $response = $messaging->send($message);
+                    $responses[] = $response;
+                } catch (\Kreait\Firebase\Exception\Messaging\NotFound $e) {
+                    // Token is invalid, add to cleanup list
+                    Log::info('Invalid token detected: ' . $token);
+                    $invalidTokens[] = $token;
+                } catch (\Exception $e) {
+                    Log::error('Error sending notification to token ' . $token . ': ' . $e->getMessage());
+                    throw $e;
+                }
+            }
+
+            // Cleanup invalid tokens from database
+            if (!empty($invalidTokens)) {
+                UsersDevice::whereIn('device_id', $invalidTokens)->delete();
+                Log::info('Cleaned up ' . count($invalidTokens) . ' invalid tokens from database');
+            }
+
+            return $responses;
+        } catch (\Exception $e) {
+            Log::error('Error in enviar_notificacao: ' . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -313,91 +374,6 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
         }
-    }
-
-    public function enviar_notificacao($titulo, $mensagem, $tokens){
-        try {
-
-            // Configurar o Firebase diretamente
-            $factory = (new \Kreait\Firebase\Factory())
-                ->withServiceAccount(base_path('firebase.json'))
-                ->withProjectId('baitasorte');
-
-            $messaging = $factory->createMessaging();
-
-            $notification = FirebaseNotification::fromArray([
-                'title' => $titulo,
-                'body' => $mensagem
-            ]);
-
-            // If tokens is a single string, convert it to array
-            if (!is_array($tokens)) {
-                $tokens = [$tokens];
-            }
-
-            // Send message to each token
-            $responses = [];
-            foreach ($tokens as $token) {
-                
-                try {
-                    $message = CloudMessage::withTarget('token', $token)
-                        ->withNotification($notification)
-                        ->withData([
-                            'sound' => 'default',
-                            'icon' => 'www/img/icones/android-icon-48x48.png'
-                        ]);
-
-                    $response = $messaging->send($message);
-                    $responses[] = $response;
-                } catch (\Exception $e) {
-                    throw $e;
-                }
-            }
-
-            return $responses;
-        } catch (\Exception $e) {
-            throw $e;
-        }
-
-        $dataBuilder = new PayloadDataBuilder();
-        $dataBuilder->addData([
-            // 'title' => "titulo teste",
-            'vibrate' => 1,
-            'pagina'=>"pagina teste",
-            'codParams'=>"params teste"
-        ]);
-
-        $option = $optionBuilder->build();
-        $notification = $notificationBuilder->build();
-        $data = $dataBuilder->build();
-
-        
-
-        // You must change it to get your tokens
-        // $tokens = $tokens;
-
-        // $downstreamResponse = FCM::sendTo($tokens, $option, $notification, $data);
-        
-        // $downstreamResponse->numberSuccess();
-        // $downstreamResponse->numberFailure();
-        // $downstreamResponse->numberModification();
-
-        // //return Array - you must remove all this tokens in your database
-        // $tokensToDelete = $downstreamResponse->tokensToDelete();
-        // \App\Aparelho::whereIn('identificador',$tokensToDelete)->delete();    
-
-        // //return Array (key : oldToken, value : new token - you must change the token in your database )
-        // $tokensToUpdate = $downstreamResponse->tokensToModify();
-        // foreach ($tokensToUpdate as $old=>$new) {
-        //     \App\Aparelho::where('identificador',$old)->update(['identificador'=>$new]);
-        // }
-
-        // //return Array - you should try to resend the message to the tokens in the array
-        // $downstreamResponse->tokensToRetry();
-
-        // // return Array (key:token, value:errror) - in production you should remove from your database the tokens present in this array
-        // $downstreamResponse->tokensWithError();
-
     }
 
     public function store_com_foto(Request $request)
