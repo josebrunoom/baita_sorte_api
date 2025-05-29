@@ -299,6 +299,7 @@ class UserController extends Controller
 
             $dentroDoRaio = $distancia <= 300;
 
+            Log::info('Distância: ' . $distancia);
             if($dentroDoRaio){
                 return response()->json([
                     'dentro_do_raio' => $dentroDoRaio,
