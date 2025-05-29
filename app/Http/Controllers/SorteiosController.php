@@ -132,14 +132,24 @@ class SorteiosController extends Controller
     public function update(Request $request, $id)
     {
 		try {
-			
-			
             if(!$Sorteio = Sorteio::find($id))
             {
                 throw new MazeException('Sorteio não encontrado.', 404);
             }
 
-            $Sorteio->fill($request->all());
+            // Atualizar os campos normais
+            $Sorteio->fill($request->except('foto'));
+
+            // Tratar a foto
+            if($arquivo = $request->file('foto')) {
+                $url = 'https://s3.' . config('app.AWS_DEFAULT_REGION') . '.amazonaws.com/' . config('app.AWS_BUCKET') . '/';
+                $name = time() . '_' . $this->clean(strtolower($request['nome']))   . '.' . $arquivo->getClientOriginalExtension();
+                
+                $filePath = 'arquivos/' . $name;
+                Storage::disk('s3')->put($filePath, file_get_contents($arquivo));
+                $Sorteio->foto = $url.$filePath;
+            }
+
             $Sorteio->save();
 
             return response()->json($Sorteio, 200);
