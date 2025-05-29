@@ -152,6 +152,35 @@ class UsersSorteioController extends Controller
         }
     }
 
+    public function getParticipantes($sorteioId)
+    {
+        try
+        {
+            $participantes = DB::table('users_sorteio')
+                ->join('users', 'users.id', 'users_sorteio.users_id')
+                ->where('users_sorteio.sorteios_id', $sorteioId)
+                ->select(
+                    'users.id as user_id',
+                    'users.nome',
+                    'users.login',
+                    'users.birth_date',
+                    'users_sorteio.created_at as data_participacao'
+                )
+                ->get();
+
+            return response()->json($participantes, 200);
+        }
+        catch (MazeException $e)
+        {
+            throw $e;
+        }
+        catch (Exception $e)
+        {
+            Log::error($e);
+            throw new MazeException('Não foi possível listar os participantes do sorteio', 500);
+        }
+    }
+
     public function delete($id)
     {
         try

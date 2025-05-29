@@ -33,6 +33,7 @@ Route::post('/users_app', 'UserController@store_app');
 
 //USERS SORTEIO APP
 Route::post('/users_sorteio', 'UsersSorteioController@store');
+Route::get('/users_sorteio/participantes/{sorteioId}', 'UsersSorteioController@getParticipantes');
 
 //USERS DEVICE APP
 Route::post('/users_device', 'UsersDeviceController@store');
